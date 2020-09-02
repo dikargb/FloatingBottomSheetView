@@ -3,8 +3,8 @@ language: objective-c
 osx_image: xcode11.6
 env:
   matrix:
-    - TEST_SDK=iphonesimulator12.1 OS=12.1 NAME='iPhone XR'
-    - TEST_SDK=iphonesimulator12.1 OS=12.1 NAME='iPhone 7'
+    - TEST_SDK=iphonesimulator13.6 OS=13.6 NAME='iPhone XR'
+    - TEST_SDK=iphonesimulator13.6 OS=13.6 NAME='iPhone 7'
 
 script:
-  - set -o pipefail && xcodebuild test -enableCodeCoverage YES -project SwiftyLib.xcodeproj -scheme SwiftyLib -sdk $TEST_SDK -destination "platform=iOS Simulator,OS=$OS,name=$NAME" ONLY_ACTIVE_ARCH=YES
+  - set -o pipefail && xcodebuild test -enableCodeCoverage YES -project FloatingBottomSheetView.xcodeproj -scheme FloatingBottomSheetView -sdk $TEST_SDK -destination "platform=iOS Simulator,OS=$OS,name=$NAME" ONLY_ACTIVE_ARCH=YES
