@@ -15,6 +15,7 @@
 		4319244124FFD45900BBF8AA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4319243F24FFD45900BBF8AA /* Main.storyboard */; };
 		4319244324FFD45C00BBF8AA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4319244224FFD45C00BBF8AA /* Assets.xcassets */; };
 		4319244624FFD45C00BBF8AA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4319244424FFD45C00BBF8AA /* LaunchScreen.storyboard */; };
+		4319244C24FFD66600BBF8AA /* FloatingBottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4319244B24FFD66600BBF8AA /* FloatingBottomSheetView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +42,7 @@
 		4319244224FFD45C00BBF8AA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4319244524FFD45C00BBF8AA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4319244724FFD45C00BBF8AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4319244B24FFD66600BBF8AA /* FloatingBottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingBottomSheetView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 			children = (
 				4319241C24FFD3FD00BBF8AA /* FloatingBottomSheetView.h */,
 				4319241D24FFD3FD00BBF8AA /* Info.plist */,
+				4319244B24FFD66600BBF8AA /* FloatingBottomSheetView.swift */,
 			);
 			path = FloatingBottomSheetView;
 			sourceTree = "<group>";
@@ -199,6 +202,7 @@
 				TargetAttributes = {
 					4319241824FFD3FD00BBF8AA = {
 						CreatedOnToolsVersion = 11.6;
+						LastSwiftMigration = 1160;
 					};
 					4319242124FFD3FE00BBF8AA = {
 						CreatedOnToolsVersion = 11.6;
@@ -260,6 +264,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4319244C24FFD66600BBF8AA /* FloatingBottomSheetView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +438,7 @@
 		4319242E24FFD3FE00BBF8AA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -448,6 +454,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = nirmata.FloatingBottomSheetView;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -456,6 +463,7 @@
 		4319242F24FFD3FE00BBF8AA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -479,6 +487,7 @@
 		4319243124FFD3FE00BBF8AA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = FloatingBottomSheetViewTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -496,6 +505,7 @@
 		4319243224FFD3FE00BBF8AA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = FloatingBottomSheetViewTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
