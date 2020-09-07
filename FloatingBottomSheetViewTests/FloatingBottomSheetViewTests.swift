@@ -11,15 +11,5 @@ import XCTest
 
 class FloatingBottomSheetViewTests: XCTestCase {
 
-    var sheetView: FloatingBottomSheetView!
     
-    override func setUp() {
-        sheetView = FloatingBottomSheetView(
-            collapsedView: UIView(),
-            expandedView: UIView())
-    }
-    
-    func testCheck() {
-        XCTAssertNotNil(sheetView.check())
-    }
 }

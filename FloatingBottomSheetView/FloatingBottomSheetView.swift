@@ -25,11 +25,16 @@ extension FloatingBottomSheetDelegate {
 
 public final class FloatingBottomSheetView: UIView {
     // MARK: - Typealias
+    /// `FloatingBottomSheetView` typealias. The view will be called as
+    /// `sheet` from here on out.
     public typealias sheet = FloatingBottomSheetView
     
     // MARK: - Properties
+    /// The default frame of `sheet`, if not defined,
+    /// `sheet` will follow this size.
     public static var defaultFrame: CGRect = CGRect(x: 0, y: 0, width: 320, height: 72)
     
+    /// Corner radius of FloatingBottomSheetView.
     public dynamic var cornerRadius: CGFloat = 8 {
         didSet {
             cornerRadius = max(cornerRadius, 0)
@@ -38,6 +43,9 @@ public final class FloatingBottomSheetView: UIView {
         }
     }
     
+    /// Left and right margin of initial floating view.
+    /// Define this property before calling `configure` or else `sheet`
+    /// will follow default value in its initialization.
     public dynamic var horizontalMargin: CGFloat = 16 {
         didSet {
             horizontalMarginConstraint?.forEach({ $0.constant = horizontalMargin })
@@ -45,6 +53,9 @@ public final class FloatingBottomSheetView: UIView {
         }
     }
     
+    /// Bottom margin of desired floating view.
+    /// Define this property before calling `configure` or else `sheet`
+    /// will follow default value in its initialization.
     public dynamic var bottomMargin: CGFloat = 16 {
         didSet {
             bottomMarginConstraint?.constant = bottomMargin
@@ -52,6 +63,10 @@ public final class FloatingBottomSheetView: UIView {
         }
     }
     
+    /// Minimum inset (left, right, bottom margin of `sheet`) for expanded state.
+    /// This property value will be assigned whenever `sheet` is updating to
+    /// 'expanded' state. Default value is 0, so the view will stick to left, right
+    /// and bottom of superview.
     public dynamic var minimumInset: CGFloat = 0 {
         didSet {
             if minimumInset < 0 { minimumInset = 0 }
@@ -59,8 +74,13 @@ public final class FloatingBottomSheetView: UIView {
         }
     }
     
+    /// Maximum inset (left, right, bottom margin of `sheet`) for collapsed state.
+    /// This property value will be assigned whenever `sheet` is updating to
+    /// 'collapsed' state. Default value is 16.
     public dynamic var maximumInset: CGFloat = 16
     
+    /// Minimum height of `sheet`. When collapsed, `sheet` will stick
+    /// to this limit minimum height. Prevents it to have less than 10 point of height.
     public dynamic var minimumHeight: CGFloat = 72 {
         didSet {
             if minimumHeight < 10 { minimumHeight = 10 }
@@ -68,11 +88,18 @@ public final class FloatingBottomSheetView: UIView {
         }
     }
     
+    /// Maximum height of `sheet`. When expanded, `sheet` will follow
+    /// this property value.
     public dynamic var maximumHeight: CGFloat = 270
     
+    /// Background color of `sheet`
     public dynamic var drawerBackgroundColor: UIColor = .white
     
+    /// Drawer view toggle, `drawerView` is the grey thin view on top side
+    /// of `sheet`.
     public dynamic var showDrawerView: Bool = true
+    
+    /// Superview dim toggle, set superview dimming based on this value.
     public dynamic var shouldDimSuperview: Bool = true
     
     /// Collapsed content view, this view will be shown when bottom sheet is collapsed.
@@ -84,28 +111,40 @@ public final class FloatingBottomSheetView: UIView {
     var delegate: FloatingBottomSheetDelegate?
     
     // MARK: - Private Properties
+    /// Property to store `sheet`'s superview.
     fileprivate var superView: UIView!
+    /// Property to store `sheet`'s dim view.
     fileprivate var dimView: UIView?
     
+    /// Property to store pan gesture.
     fileprivate var pan: UIPanGestureRecognizer!
+    /// Property to store content view of `sheet`.
     fileprivate var contentView: UIView!
     
+    /// Property to store left and right constraints.
     fileprivate var horizontalMarginConstraint: [NSLayoutConstraint]? = nil
+    /// Property to store bottom margin constraint.
     fileprivate var bottomMarginConstraint: NSLayoutConstraint? = nil
+    /// Property to store height constraint.
     fileprivate var heightConstraint: NSLayoutConstraint? = nil
     
+    /// Property to store initial height after `sheet` state update.
     fileprivate var initHeight: CGFloat = 72
+    /// Property to store initial inset after `sheet` state update.
     fileprivate var initInset: CGFloat = 16
     
     // MARK: - init
-    public required init?(coder aDecoder: NSCoder) {
+    /// Required coder init.
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override init(frame: CGRect) {
+    /// Overrides view init to set view frame.
+    override init(frame: CGRect) {
         super.init(frame: sheet.defaultFrame)
     }
     
+    /// Required init to set collapsed and expanded views. (Main initialization method)
     public init(collapsedView: UIView, expandedView: UIView) {
         super.init(frame: sheet.defaultFrame)
         self.collapsedContentView = collapsedView
@@ -114,7 +153,11 @@ public final class FloatingBottomSheetView: UIView {
 }
 
 extension FloatingBottomSheetView {
-    // MARK: - Configuration
+    // MARK: - Public Methods
+    
+    /// Call this method immediately after defining `sheet` in your class.
+    /// If you desire a set minimum and maximum height, you need to define that too
+    /// before calling this method.
     public func configure(in superview: UIView) {
         for subview in subviews {
             subview.removeFromSuperview()
@@ -264,10 +307,55 @@ extension FloatingBottomSheetView {
         superview.layoutIfNeeded()
     }
     
-    public func check() -> Bool {
-        return contentView != nil
+    /// Instruct `sheet` to collapse programmatically, if `sheet` is in expanded
+    /// state.
+    public func collapse() {
+        if initHeight == minimumHeight { return }
+        self.heightConstraint?.constant = minimumHeight
+        self.bottomMarginConstraint?.constant = -maximumInset
+        self.horizontalMarginConstraint?.first?.constant = maximumInset
+        self.horizontalMarginConstraint?.last?.constant = maximumInset
+        
+        initHeight = minimumHeight
+        UIView.animate(withDuration: 0.2) {
+            
+            self.dimView?.alpha = 0
+            self.collapsedContentView.alpha = 1
+            self.expandedContentView.alpha = 0
+            
+            self.superview?.setNeedsLayout()
+            self.superview?.layoutIfNeeded()
+        }
+        delegate?.floatingBottomSheetDidCollapse()
     }
     
+    /// Instruct `sheet` to expand programmatically, if `sheet` is in collapsed
+    /// state.
+    public func expand() {
+        if initHeight == maximumHeight { return }
+        self.heightConstraint?.constant = maximumHeight
+        self.bottomMarginConstraint?.constant = -minimumInset
+        self.horizontalMarginConstraint?.first?.constant = minimumInset
+        self.horizontalMarginConstraint?.last?.constant = minimumInset
+        
+        initHeight = maximumHeight
+        UIView.animate(withDuration: 0.2) {
+            
+            self.dimView?.alpha = 0.5
+            self.collapsedContentView.alpha = 0
+            self.expandedContentView.alpha = 1
+            
+            self.superview?.setNeedsLayout()
+            self.superview?.layoutIfNeeded()
+        }
+        delegate?.floatingBottomSheetDidExpand()
+    }
+    
+    // MARK: - Private Methods
+    
+    /// Add dim layer to black out view behind `sheet` so parent view
+    /// will be blocked slightly by this layer. User can set this on or off
+    /// through the `shouldDimSuperview` property.
     private func addDimLayerTo(superView: UIView) {
         let dimView = UIView(frame: superView.frame)
         dimView.translatesAutoresizingMaskIntoConstraints = false
@@ -292,8 +380,10 @@ extension FloatingBottomSheetView {
     }
 }
 
-// MARK: - Actions
 private extension FloatingBottomSheetView {
+    
+    // MARK: - Private Actions
+    
     /// Pan gesture handler
     @objc func handlePan(gestureRecognizer: UIPanGestureRecognizer) {
         let translation = pan.translation(in: nil)
