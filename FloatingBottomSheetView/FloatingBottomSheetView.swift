@@ -2,7 +2,7 @@
 //  FloatingBottomSheetView.swift
 //  FloatingBottomSheetView
 //
-//  Created by Sinar Nirmata on 02/09/20.
+//  Created by Krisnandika Aji on 02/09/20.
 //  Copyright © 2020 Sinar Nirmata. All rights reserved.
 //
 
@@ -270,7 +270,6 @@ public extension FloatingBottomSheetView {
         
         superview.addSubview(self)
         self.superView = superview
-        
             
         let horizontalConstraints = NSLayoutConstraint.constraints(
             withVisualFormat: "H:|-\(horizontalMargin)-[sheetView]-\(horizontalMargin)-|",

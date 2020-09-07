@@ -14,6 +14,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        view.backgroundColor = UIColor.lightGray
         
         let collapsedView = UIView()
         collapsedView.backgroundColor = .systemTeal
