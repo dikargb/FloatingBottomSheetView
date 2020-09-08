@@ -106,7 +106,7 @@ open class FloatingBottomSheetView: UIView {
     @objc open dynamic var collapsedContentView: UIView!
     
     /// Expanded content view, this view will be shown when bottom sheet is expanded.
-    @objc open dynamic var expandedContentView: UIView!
+    @objc open dynamic var expandedContentView: UIView?
     
     var delegate: FloatingBottomSheetDelegate?
     
@@ -120,6 +120,8 @@ open class FloatingBottomSheetView: UIView {
     fileprivate var pan: UIPanGestureRecognizer!
     /// Property to store content view of `sheet`.
     fileprivate var contentView: UIView!
+    /// Property to store single view status.
+    fileprivate var singleView: Bool { expandedContentView == nil }
     
     /// Property to store left and right constraints.
     fileprivate var horizontalMarginConstraint: [NSLayoutConstraint]? = nil
@@ -145,9 +147,9 @@ open class FloatingBottomSheetView: UIView {
     }
     
     /// Required init to set collapsed and expanded views. (Main initialization method)
-    public init(collapsedView: UIView, expandedView: UIView) {
+    public init(initView: UIView, expandedView: UIView?) {
         super.init(frame: sheet.defaultFrame)
-        self.collapsedContentView = collapsedView
+        self.collapsedContentView = initView
         self.expandedContentView = expandedView
     }
 }
@@ -180,16 +182,15 @@ public extension FloatingBottomSheetView {
         drawerView.layer.cornerRadius = 3
         drawerView.translatesAutoresizingMaskIntoConstraints = false
         
-        guard let collapsedContentView = collapsedContentView,
-            let expandedContentView = expandedContentView else {
-                fatalError("Collapsed and expanded view must be set.")
+        guard let collapsedContentView = collapsedContentView else {
+                fatalError("Init (collapsed) view must be set.")
         }
         
         contentView.addSubview(collapsedContentView)
-        contentView.addSubview(expandedContentView)
+        if let expandedView = expandedContentView { contentView.addSubview(expandedView) }
         if showDrawerView { contentView.addSubview(drawerView) }
         
-        expandedContentView.alpha = 0
+        expandedContentView?.alpha = 0
         
         let heightSelfConstraint = NSLayoutConstraint.init(
             item: self,
@@ -211,18 +212,6 @@ public extension FloatingBottomSheetView {
             options: .init(rawValue: 0),
             metrics: nil,
             views: ["collapsedView": collapsedContentView])
-            
-        let expandedViewHConstraints = NSLayoutConstraint.constraints(
-            withVisualFormat: "H:|-0-[expandedView]-0-|",
-            options: .init(rawValue: 0),
-            metrics: nil,
-            views: ["expandedView": expandedContentView])
-        
-        let expandedViewVConstrains = NSLayoutConstraint.constraints(
-            withVisualFormat: "V:|-16-[expandedView]-0-|",
-            options: .init(rawValue: 0),
-            metrics: nil,
-            views: ["expandedView": expandedContentView])
         
         let drawerVConstraints = NSLayoutConstraint.constraints(
             withVisualFormat: "V:|-6-[drawerView(4)]",
@@ -240,14 +229,29 @@ public extension FloatingBottomSheetView {
             relatedBy: .equal,
             toItem: nil, attribute: .notAnAttribute,
             multiplier: 1, constant: 100)
+            
+        if let expandedView = expandedContentView {
+            let expandedViewHConstraints = NSLayoutConstraint.constraints(
+                withVisualFormat: "H:|-0-[expandedView]-0-|",
+                options: .init(rawValue: 0),
+                metrics: nil,
+                views: ["expandedView": expandedView])
+            
+            let expandedViewVConstrains = NSLayoutConstraint.constraints(
+                withVisualFormat: "V:|-16-[expandedView]-0-|",
+                options: .init(rawValue: 0),
+                metrics: nil,
+                views: ["expandedView": expandedView])
+            
+                contentView.addConstraints(expandedViewHConstraints)
+                contentView.addConstraints(expandedViewVConstrains)
+        }
         
         contentView.addConstraint(drawerWidthConstraint)
         contentView.addConstraint(drawerHConstraints)
         contentView.addConstraints(drawerVConstraints)
         contentView.addConstraints(collapsedViewVConstrains)
         contentView.addConstraints(collapsedViewHConstraints)
-        contentView.addConstraints(expandedViewHConstraints)
-        contentView.addConstraints(expandedViewVConstrains)
         
         self.addSubview(contentView)
         
@@ -319,8 +323,10 @@ public extension FloatingBottomSheetView {
         UIView.animate(withDuration: 0.2) {
             
             self.dimView?.alpha = 0
-            self.collapsedContentView.alpha = 1
-            self.expandedContentView.alpha = 0
+            if !self.singleView {
+                self.collapsedContentView.alpha = 1
+                self.expandedContentView?.alpha = 0
+            }
             
             self.superview?.setNeedsLayout()
             self.superview?.layoutIfNeeded()
@@ -341,8 +347,10 @@ public extension FloatingBottomSheetView {
         UIView.animate(withDuration: 0.2) {
             
             self.dimView?.alpha = 0.5
-            self.collapsedContentView.alpha = 0
-            self.expandedContentView.alpha = 1
+            if !self.singleView {
+                self.collapsedContentView.alpha = 0
+                self.expandedContentView?.alpha = 1
+            }
             
             self.superview?.setNeedsLayout()
             self.superview?.layoutIfNeeded()
@@ -419,8 +427,10 @@ private extension FloatingBottomSheetView {
                 self.horizontalMarginConstraint?.last?.constant = inset
                 
                 self.dimView?.alpha = alpha
-                self.collapsedContentView.alpha = 1 - progress
-                self.expandedContentView.alpha = progress
+                if !self.singleView {
+                    self.collapsedContentView.alpha = 1 - progress
+                    self.expandedContentView?.alpha = progress
+                }
                 self.delegate?.floatingButtonSheetDidUpdate(sheet: self, progress: progress)
             }
         case .ended:
@@ -446,8 +456,10 @@ private extension FloatingBottomSheetView {
             UIView.animate(withDuration: 0.2) {
                 
                 self.dimView?.alpha = resultH < 0.5 ? 0 : 0.5
-                self.collapsedContentView.alpha = resultH < 0.5 ? 1 : 0
-                self.expandedContentView.alpha = resultH > 0.5 ? 1 : 0
+                if !self.singleView {
+                    self.collapsedContentView.alpha = resultH < 0.5 ? 1 : 0
+                    self.expandedContentView?.alpha = resultH > 0.5 ? 1 : 0
+                }
                 
                 self.superview?.setNeedsLayout()
                 self.superview?.layoutIfNeeded()
