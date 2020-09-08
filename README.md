@@ -1,5 +1,6 @@
 # FloatingBottomSheetView
 ![Generic badge](https://img.shields.io/travis/dikargb/FloatingBottomSheetView/master)
+
 Simple floating bottom sheet view with collapsible and expandable ability.
 
 ### Installation
