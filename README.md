@@ -4,6 +4,7 @@
 Simple floating bottom sheet view with collapsible and expandable ability.
 
 Example:
+
 ![Example](https://im7.ezgif.com/tmp/ezgif-7-a072b91ba1d4.gif)
 
 
