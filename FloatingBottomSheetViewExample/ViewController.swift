@@ -18,9 +18,11 @@ class ViewController: UIViewController {
         
         let collapsedView = UIView()
         collapsedView.backgroundColor = .systemTeal
+        let expandedView = UIView()
+        expandedView.backgroundColor = .magenta
         
         let floatingView = FloatingBottomSheetView(initView: collapsedView,
-                                                   expandedView: nil)
+                                                   expandedView: expandedView)
         floatingView.minimumHeight = 72 // set sheet's minimum height
         floatingView.maximumHeight = 270 // set sheet's maximum height
         floatingView.minimumInset = 0 // set sheet's minimum inset for expanded state (usually 0)

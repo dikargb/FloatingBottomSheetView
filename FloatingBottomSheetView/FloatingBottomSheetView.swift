@@ -212,8 +212,13 @@ public extension FloatingBottomSheetView {
                 fatalError("Init (collapsed) view must be set.")
         }
         
+        collapsedContentView.translatesAutoresizingMaskIntoConstraints = false
+        
         contentView.addSubview(collapsedContentView)
-        if let expandedView = expandedContentView { contentView.addSubview(expandedView) }
+        if let expandedView = expandedContentView {
+            expandedView.translatesAutoresizingMaskIntoConstraints = false
+            contentView.addSubview(expandedView)
+        }
         if showDrawerView { contentView.addSubview(drawerView) }
         
         expandedContentView?.alpha = 0
@@ -351,7 +356,6 @@ public extension FloatingBottomSheetView {
     /// Instruct `sheet` to collapse programmatically, if `sheet` is in expanded
     /// state.
     func collapse() {
-        if initHeight == minimumHeight { return }
         self.heightConstraint?.constant = minimumHeight
         self.bottomMarginConstraint?.constant = -maximumInset
         self.horizontalMarginConstraint?.first?.constant = maximumInset
@@ -364,6 +368,8 @@ public extension FloatingBottomSheetView {
             if !self.singleView {
                 self.collapsedContentView.alpha = 1
                 self.expandedContentView?.alpha = 0
+                
+                self.expandedContentView?.isHidden = true
             }
             
             self.superview?.setNeedsLayout()
@@ -375,7 +381,6 @@ public extension FloatingBottomSheetView {
     /// Instruct `sheet` to expand programmatically, if `sheet` is in collapsed
     /// state.
     func expand() {
-        if initHeight == maximumHeight { return }
         self.heightConstraint?.constant = maximumHeight
         self.bottomMarginConstraint?.constant = -minimumInset
         self.horizontalMarginConstraint?.first?.constant = minimumInset
@@ -388,6 +393,8 @@ public extension FloatingBottomSheetView {
             if !self.singleView {
                 self.collapsedContentView.alpha = 0
                 self.expandedContentView?.alpha = 1
+                
+                self.collapsedContentView.isHidden = true
             }
             
             self.superview?.setNeedsLayout()
@@ -443,6 +450,9 @@ private extension FloatingBottomSheetView {
         var progress = (initHeight - minimumHeight) / heightRange
         
         switch pan.state {
+        case .began:
+            self.collapsedContentView.isHidden = false
+            self.expandedContentView?.isHidden = false
         case .changed:
             var yProgress: CGFloat = 0
             yProgress = 0 - (y / heightRange)
@@ -468,6 +478,9 @@ private extension FloatingBottomSheetView {
                 if !self.singleView {
                     self.collapsedContentView.alpha = 1 - progress
                     self.expandedContentView?.alpha = progress
+                    
+                    self.collapsedContentView.isHidden = progress == 1
+                    self.expandedContentView?.isHidden = progress == 0
                 }
                 self.delegate?.floatingButtonSheetDidUpdate(sheet: self, progress: progress)
             }
@@ -475,32 +488,10 @@ private extension FloatingBottomSheetView {
             let resultH: CGFloat = heightConstraint!.constant / maximumHeight
             if resultH < 0.5 {
                 /// Collapse view
-                self.heightConstraint?.constant = minimumHeight
-                self.bottomMarginConstraint?.constant = -maximumInset
-                self.horizontalMarginConstraint?.first?.constant = maximumInset
-                self.horizontalMarginConstraint?.last?.constant = maximumInset
-                
-                delegate?.floatingBottomSheetDidCollapse()
+                collapse()
             } else {
                 /// Expand view
-                self.heightConstraint?.constant = maximumHeight
-                self.bottomMarginConstraint?.constant = -minimumInset
-                self.horizontalMarginConstraint?.first?.constant = minimumInset
-                self.horizontalMarginConstraint?.last?.constant = minimumInset
-                
-                delegate?.floatingBottomSheetDidExpand()
-            }
-            initHeight = heightConstraint!.constant
-            UIView.animate(withDuration: 0.2) {
-                
-                self.dimView?.alpha = resultH < 0.5 ? 0 : 0.5
-                if !self.singleView {
-                    self.collapsedContentView.alpha = resultH < 0.5 ? 1 : 0
-                    self.expandedContentView?.alpha = resultH > 0.5 ? 1 : 0
-                }
-                
-                self.superview?.setNeedsLayout()
-                self.superview?.layoutIfNeeded()
+                expand()
             }
         default: break
         }
