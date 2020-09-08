@@ -11,5 +11,10 @@ import XCTest
 
 class FloatingBottomSheetViewTests: XCTestCase {
 
+    let floatinSheet: FloatingBottomSheetView!
     
+    override func setUp() {
+        floatinSheet = FloatingBottomSheetView(collapsedView: UIView(),
+                                               expandedView: UIView())
+    }
 }
