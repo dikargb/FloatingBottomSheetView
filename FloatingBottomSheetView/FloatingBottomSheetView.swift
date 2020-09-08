@@ -92,6 +92,15 @@ open class FloatingBottomSheetView: UIView {
     /// this property value.
     open dynamic var maximumHeight: CGFloat = 270
     
+    /// ShadowView's offset
+    open dynamic var shadowOffset: CGSize = .zero
+    
+    /// ShadowView's radius
+    open dynamic var shadowRadius: CGFloat = 7
+    
+    /// ShadowView's opacity
+    open dynamic var shadowOpacity: Float = 0.1
+    
     /// Background color of `sheet`
     open dynamic var drawerBackgroundColor: UIColor = .white
     
@@ -101,6 +110,9 @@ open class FloatingBottomSheetView: UIView {
     
     /// Superview dim toggle, set superview dimming based on this value.
     open dynamic var shouldDimSuperview: Bool = true
+    
+    /// Show shadow toggle
+    open dynamic var showShadowView: Bool = true
     
     /// Collapsed content view, this view will be shown when bottom sheet is collapsed.
     @objc open dynamic var collapsedContentView: UIView!
@@ -120,6 +132,7 @@ open class FloatingBottomSheetView: UIView {
     fileprivate var pan: UIPanGestureRecognizer!
     /// Property to store content view of `sheet`.
     fileprivate var contentView: UIView!
+    fileprivate var shadowView: UIView!
     /// Property to store single view status.
     fileprivate var singleView: Bool { expandedContentView == nil }
     
@@ -170,6 +183,19 @@ public extension FloatingBottomSheetView {
         contentView.translatesAutoresizingMaskIntoConstraints = false
         contentView.frame = sheet.defaultFrame
         contentView.backgroundColor = drawerBackgroundColor
+        
+        let shadowView = UIView()
+        self.shadowView = shadowView
+        shadowView.translatesAutoresizingMaskIntoConstraints = false
+        shadowView.frame = sheet.defaultFrame
+        shadowView.backgroundColor = drawerBackgroundColor
+        shadowView.clipsToBounds = false
+        shadowView.layer.shouldRasterize = true
+        shadowView.layer.rasterizationScale = UIScreen.main.scale
+        shadowView.layer.cornerRadius = cornerRadius
+        shadowView.layer.shadowOffset = shadowOffset
+        shadowView.layer.shadowRadius = shadowRadius
+        shadowView.layer.shadowOpacity = shadowOpacity
         
         translatesAutoresizingMaskIntoConstraints = false
         layer.cornerRadius = cornerRadius
@@ -272,8 +298,20 @@ public extension FloatingBottomSheetView {
         
         if shouldDimSuperview { addDimLayerTo(superView: superview )}
         
+        shadowView.isHidden = !showShadowView
+        superview.addSubview(shadowView)
+        
         superview.addSubview(self)
         self.superView = superview
+        
+        if showShadowView {
+            NSLayoutConstraint.activate([
+                shadowView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+                shadowView.topAnchor.constraint(equalTo: self.topAnchor),
+                shadowView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+                shadowView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+            ])
+        }
             
         let horizontalConstraints = NSLayoutConstraint.constraints(
             withVisualFormat: "H:|-\(horizontalMargin)-[sheetView]-\(horizontalMargin)-|",
