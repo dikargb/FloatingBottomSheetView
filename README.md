@@ -1,5 +1,5 @@
 # FloatingBottomSheetView
-![Generic badge](https://img.shields.io/travis/dikargb/FloatingBottomSheetView/master)
+![Travis Build](https://img.shields.io/travis/dikargb/FloatingBottomSheetView/master) ![Swift 4.2](https://img.shields.io/badge/swift-5-orange?logo=swift&logoColor=white)
 
 Simple floating bottom sheet view with collapsible and expandable ability.
 
